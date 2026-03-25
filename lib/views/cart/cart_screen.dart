@@ -51,12 +51,14 @@ class _CartScreenState extends State<CartScreen> {
                     return Card(
                       child: ListTile(
                         // SAFETY CHECK: Don't show image if list is empty
-                        leading: (item.product.images.isNotEmpty)
-                            ? Image.network(item.product.images[0], width: 50, fit: BoxFit.cover)
-                            : const Icon(Icons.image_not_supported, size: 50),
+                        // leading: (item.product.images.isNotEmpty)
+                        //     ? Image.network(item.product.images[0], width: 50, fit: BoxFit.cover)
+                        //     : const Icon(Icons.image_not_supported, size: 50),
                         title: Text(item.product.name),
                         subtitle: Text("Qty: ${item.quantity}"),
-                        trailing: Text("\$${(item.product.price * item.quantity).toStringAsFixed(2)}"),
+                        trailing: Text(
+                          "\$${(item.product.price * item.quantity).toStringAsFixed(2)}",
+                        ),
                       ),
                     );
                   },
@@ -73,7 +75,10 @@ class _CartScreenState extends State<CartScreen> {
   Widget _buildCheckoutArea(CartModel cart) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)]),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -81,8 +86,14 @@ class _CartScreenState extends State<CartScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text("Total:", style: TextStyle(fontSize: 18)),
-              Text("\$${cart.totalAmount.toStringAsFixed(2)}", 
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.green)),
+              Text(
+                "\$${cart.totalAmount.toStringAsFixed(2)}",
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 15),
@@ -99,12 +110,17 @@ class _CartScreenState extends State<CartScreen> {
               Expanded(
                 child: ElevatedButton(
                   onPressed: () => CartController.payNow(context),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-                  child: const Text("PAY NOW", style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                  ),
+                  child: const Text(
+                    "PAY NOW",
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
             ],
-          )
+          ),
         ],
       ),
     );

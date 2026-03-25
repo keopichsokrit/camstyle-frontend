@@ -10,6 +10,11 @@ import '../../views/user/profile_screen.dart';
 import '../../views/admin/admin_dashboard.dart';
 import '../../views/cart/cart_screen.dart';
 import '../../views/cart/payment_screen.dart';
+import '../../views/admin/new_product_screen.dart';
+import '../../views/admin/new_category_screen.dart';
+import '../../views/admin/update_product_screen.dart';
+import '../../views/admin/update_category_screen.dart';
+
 
 class AppRoutes {
   static const String startUp = '/';
@@ -21,6 +26,10 @@ class AppRoutes {
   static const String cart = '/cart';
   static const String profile = '/profile';
   static const String payment = '/payment';
+  static const String newProduct = '/new-product';
+  static const String newCategory = '/new-category';
+  static const String updateProduct = '/update-product';
+  static const String updateCategory = '/update-category';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -60,6 +69,20 @@ class AppRoutes {
       case payment:
         return MaterialPageRoute(builder: (_) => const PaymentScreen());
       
+      // 3. ADD THE NEW CASES HERE
+      case newProduct:
+        return MaterialPageRoute(builder: (_) => const NewProductScreen());
+      
+      case newCategory:
+        return MaterialPageRoute(builder: (_) => const NewCategoryScreen());
+      
+      case updateProduct:
+        return MaterialPageRoute(builder: (_) => const UpdateProductScreen());
+      
+      case updateCategory:
+        return MaterialPageRoute(builder: (_) => const UpdateCategoryScreen());
+
+      // 4. ONLY ONE DEFAULT AT THE BOTTOM
       default:
         return _errorRoute("No route defined for ${settings.name}");
     }
