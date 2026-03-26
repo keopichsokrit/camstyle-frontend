@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../../controllers/product_controller.dart';
 import '../../models/product_model.dart';
 import '../../core/routes/app_routes.dart';
+import '../../controllers/user_controller.dart';
+import '../../models/user_model.dart';
+import '../../core/utils/storage_helper.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -40,32 +43,88 @@ class _HomeScreenState extends State<HomeScreen> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const UserAccountsDrawerHeader(
-              decoration: BoxDecoration(color: Colors.blueGrey),
-              accountName: Text(
-                "User Name",
-              ), // Replace with Profile Controller data
-              accountEmail: Text("user@email.com"),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Icon(Icons.person),
-              ),
+            // 1. THE HEADER WITH PROFILE DATA
+            FutureBuilder<UserModel?>(
+              future:
+                  UserController.getProfile(), // Fetches from your Node.js /api/auth/profile
+              builder: (context, snapshot) {
+                final user = snapshot.data;
+
+                return UserAccountsDrawerHeader(
+                  decoration: const BoxDecoration(color: Colors.blueAccent),
+                  currentAccountPicture: CircleAvatar(
+                    backgroundColor: Colors.white,
+                    backgroundImage:
+                        (user?.avatar != null && user!.avatar!.isNotEmpty)
+                        ? NetworkImage(
+                            user.avatar!,
+                          ) // Cloudinary URL from backend
+                        : null,
+                    child: (user?.avatar == null || user!.avatar!.isEmpty)
+                        ? const Icon(
+                            Icons.person,
+                            size: 40,
+                            color: Colors.blueAccent,
+                          )
+                        : null,
+                  ),
+                  accountName: Text(
+                    user?.name ?? "Loading...",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  accountEmail: Text(user?.email ?? ""),
+                );
+              },
+            ),
+
+            // 2. NAVIGATION ITEMS
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text("Home"),
+              onTap: () => Navigator.pop(context),
             ),
             ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text("Settings"),
-              onTap: () {},
+              leading: const Icon(Icons.person_outline),
+              title: const Text("My Profile"),
+              onTap: () {
+                Navigator.pop(context); // Close drawer
+                Navigator.pushNamed(context, '/profile');
+              },
             ),
+            ListTile(
+              leading: const Icon(Icons.password),
+              title: const Text("Change_Password"),
+              onTap: () {
+                Navigator.pop(context); // Close drawer
+                Navigator.pushNamed(context, '/change-password');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.help_outline),
+              title: const Text("Help"),
+              onTap: () {
+                Navigator.pop(context); // Close drawer
+                Navigator.pushNamed(context, '/help');
+              },
+            ),
+            const Divider(),
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text("Logout"),
-              onTap: () =>
-                  Navigator.pushReplacementNamed(context, AppRoutes.login),
+              title: const Text("Logout", style: TextStyle(color: Colors.red)),
+              onTap: () async {
+                await StorageHelper.logout();
+                if (context.mounted) {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/login',
+                    (route) => false,
+                  );
+                }
+              },
             ),
           ],
         ),
       ),
-
       // 2. THE BODY (Product Grid from Backend)
       body: FutureBuilder<List<ProductModel>>(
         future: ProductController.getAllProducts(),

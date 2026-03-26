@@ -14,7 +14,8 @@ import '../../views/admin/new_product_screen.dart';
 import '../../views/admin/new_category_screen.dart';
 import '../../views/admin/update_product_screen.dart';
 import '../../views/admin/update_category_screen.dart';
-
+import '../../views/user/change_password_screen.dart';
+import '../../views/user/help_screen.dart';
 
 class AppRoutes {
   static const String startUp = '/';
@@ -30,6 +31,8 @@ class AppRoutes {
   static const String newCategory = '/new-category';
   static const String updateProduct = '/update-product';
   static const String updateCategory = '/update-category';
+  static const String changePassword = '/change-password';
+  static const String help = '/help';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -81,6 +84,10 @@ class AppRoutes {
       
       case updateCategory:
         return MaterialPageRoute(builder: (_) => const UpdateCategoryScreen());
+      case changePassword:
+        return MaterialPageRoute(builder: (_) => const ChangePasswordScreen());
+      case help:
+        return MaterialPageRoute(builder: (_) => const HelpScreen());
 
       // 4. ONLY ONE DEFAULT AT THE BOTTOM
       default:

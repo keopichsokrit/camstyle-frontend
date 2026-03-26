@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../utils/storage_helper.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ApiConstants {
   // 1. Base Configuration
@@ -77,7 +78,7 @@ class ApiConstants {
     required String url,
     required String method,
     required Map<String, String> fields,
-    String? filePath,
+    XFile? imageFile, // Use XFile directly
     String fileKey = 'image',
   }) async {
     final token = await StorageHelper.getToken();
@@ -89,8 +90,14 @@ class ApiConstants {
 
     request.fields.addAll(fields);
 
-    if (filePath != null) {
-      request.files.add(await http.MultipartFile.fromPath(fileKey, filePath));
+    // CROSS-PLATFORM FIX: Read bytes instead of using path
+    if (imageFile != null) {
+      final bytes = await imageFile.readAsBytes();
+      request.files.add(http.MultipartFile.fromBytes(
+        fileKey,
+        bytes,
+        filename: imageFile.name,
+      ));
     }
 
     return await request.send();

@@ -45,6 +45,8 @@ lib/
 │   ├── user/                     # User Home/Profile UI
 │   │   ├── home_screen.dart 
 │   │   ├── profile_screen.dart
+│   │   ├── change_password_screen.dart
+│   │   ├── help_screen.dart
 │   │   └── product_detail_screen.dart 
 │   ├── cart/                     # Cart/QR Code UI
 │   │   ├── cart_screen.dart
