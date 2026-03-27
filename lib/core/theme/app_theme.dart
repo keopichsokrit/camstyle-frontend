@@ -1,22 +1,34 @@
 import 'package:flutter/material.dart';
 
-class AppTheme {
-  static ThemeData get lightTheme {
-    return ThemeData(
-      primarySwatch: Colors.teal,
-      scaffoldBackgroundColor: Colors.grey[50],
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-      ),
-    );
-  }
-}
+ColorScheme cs = ColorScheme.fromSeed(seedColor: Colors.cyanAccent);
+ColorScheme sc = ColorScheme.fromSeed(seedColor: Colors.blue);
+final ThemeData lighttheme = ThemeData(
+  appBarTheme: AppBarTheme(
+    backgroundColor: cs.primary,
+  ),
+  scaffoldBackgroundColor: cs.secondary,
+  drawerTheme: DrawerThemeData(
+    backgroundColor: cs.secondary,
+  ),
+  floatingActionButtonTheme: FloatingActionButtonThemeData(
+    backgroundColor: cs.tertiary,
+  ),
+  bottomNavigationBarTheme: BottomNavigationBarThemeData(
+    backgroundColor: cs.primary,
+  ),
+);
+final ThemeData darktheme = ThemeData(
+  appBarTheme: AppBarTheme(
+    backgroundColor: sc.primary,
+  ),
+  scaffoldBackgroundColor: cs.secondary,
+  drawerTheme: DrawerThemeData(
+    backgroundColor: sc.secondary,
+  ),
+  floatingActionButtonTheme: FloatingActionButtonThemeData(
+    backgroundColor: sc.tertiary,
+  ),
+  bottomNavigationBarTheme: BottomNavigationBarThemeData(
+    backgroundColor: sc.primary,
+  ),
+);

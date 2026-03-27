@@ -6,7 +6,11 @@ import '../core/routes/app_routes.dart';
 
 class AuthController {
   // --- LOGIN LOGIC ---
-  static Future<void> login(BuildContext context, String email, String password) async {
+  static Future<void> login(
+    BuildContext context,
+    String email,
+    String password,
+  ) async {
     try {
       final response = await ApiConstants.post(ApiConstants.login, {
         "email": email,
@@ -15,10 +19,10 @@ class AuthController {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        
+
         // Save token to storage for future API calls
         await StorageHelper.saveToken(data['token']);
-        
+
         // Check role and navigate
         if (data['role'] == 'admin') {
           Navigator.pushReplacementNamed(context, AppRoutes.adminHome);
@@ -36,10 +40,10 @@ class AuthController {
 
   // --- REGISTER LOGIC ---
   static Future<void> register(
-    BuildContext context, 
-    String name, 
-    String email, 
-    String password
+    BuildContext context,
+    String name,
+    String email,
+    String password,
   ) async {
     // 1. Simple validation before even hitting the API
     if (name.isEmpty || email.isEmpty || password.isEmpty) {
@@ -83,5 +87,55 @@ class AuthController {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
+  }
+
+  // --- FORGOT PASSWORD STEP 1 ---
+  static Future<bool> sendOTP(BuildContext context, String email) async {
+    try {
+      final response = await ApiConstants.post(ApiConstants.forgotPassword, {
+        "email": email,
+      });
+      if (response.statusCode == 200) {
+        return true; // Success
+      } else {
+        final error = jsonDecode(response.body);
+        _showError(context, error['message'] ?? "Error sending OTP");
+        return false;
+      }
+    } catch (e) {
+      _showError(context, "Connection Error");
+      return false;
+    }
+  }
+
+  // --- FORGOT PASSWORD STEP 2 ---
+  static Future<void> resetPassword(
+    BuildContext context,
+    String email,
+    String otp,
+    String newPassword,
+  ) async {
+    try {
+      final response = await ApiConstants.post(ApiConstants.resetPassword, {
+        "email": email,
+        "otp": otp,
+        "newPassword": newPassword,
+      });
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Password Reset Successful!"),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pushReplacementNamed(context, AppRoutes.login);
+      } else {
+        final error = jsonDecode(response.body);
+        _showError(context, error['message'] ?? "Invalid OTP or Expired");
+      }
+    } catch (e) {
+      _showError(context, "Connection Error");
+    }
   }
 }

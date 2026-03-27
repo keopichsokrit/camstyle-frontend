@@ -24,6 +24,12 @@ class UserController {
     String? oldPassword,
     String? newPassword,
     XFile? imageFile,
+    // --- NEW ARGUMENTS ---
+    String? birthdate,
+    String? home,
+    String? city,
+    String? homeTown,
+    String? phoneNumber,
   }) async {
     try {
       Map<String, String> fields = {};
@@ -32,7 +38,12 @@ class UserController {
       if (name != null && name.isNotEmpty) fields["name"] = name;
       if (oldPassword != null && oldPassword.isNotEmpty) fields["oldPassword"] = oldPassword;
       if (newPassword != null && newPassword.isNotEmpty) fields["newPassword"] = newPassword;
-
+      // Add new fields to the multipart request
+      if (birthdate != null) fields["birthdate"] = birthdate;
+      if (home != null) fields["home"] = home;
+      if (city != null) fields["city"] = city;
+      if (homeTown != null) fields["homeTown"] = homeTown;
+      if (phoneNumber != null) fields["phoneNumber"] = phoneNumber;
       final streamedResponse = await ApiConstants.multipartRequest(
         url: ApiConstants.updateProfile,
         method: 'PUT',

@@ -14,6 +14,11 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final _nameController = TextEditingController();
+  final _homeController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _homeTownController = TextEditingController();
+  final _phoneController = TextEditingController();
+  DateTime? _selectedDate;
   UserModel? _user;
   XFile? _pickedImage;
   bool _isLoading = true;
@@ -30,6 +35,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         _user = user;
         _nameController.text = user.name;
+        _homeController.text = user.home;
+        _cityController.text = user.city;
+        _homeTownController.text = user.homeTown;
+        _phoneController.text = user.phoneNumber;
+        _selectedDate = user.birthdate;
         _isLoading = false;
       });
     }
@@ -47,10 +57,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       name: _nameController.text.trim(),
       imageFile: _pickedImage,
+      // --- ADD THESE NEW FIELDS ---
+      phoneNumber: _phoneController.text.trim(),
+      home: _homeController.text.trim(),
+      city: _cityController.text.trim(),
+      homeTown: _homeTownController.text.trim(),
+      birthdate: _selectedDate?.toIso8601String(), // Send date as String
     );
     setState(() => _isLoading = false);
     if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profile Updated!")));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Profile Updated!")));
       _pickedImage = null;
       _fetchProfile();
     }
@@ -58,15 +76,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   ImageProvider? _getAvatar() {
     if (_pickedImage != null) {
-      return kIsWeb ? NetworkImage(_pickedImage!.path) : FileImage(File(_pickedImage!.path)) as ImageProvider;
+      return kIsWeb
+          ? NetworkImage(_pickedImage!.path)
+          : FileImage(File(_pickedImage!.path)) as ImageProvider;
     }
-    if (_user?.avatar != null && _user!.avatar!.isNotEmpty) return NetworkImage(_user!.avatar!);
+    if (_user?.avatar != null && _user!.avatar!.isNotEmpty)
+      return NetworkImage(_user!.avatar!);
     return null;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    if (_isLoading)
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
 
     return Scaffold(
       appBar: AppBar(title: const Text("Edit Profile")),
@@ -74,19 +96,96 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
+            // 1. AVATAR SECTION
             GestureDetector(
               onTap: _pickImage,
               child: CircleAvatar(
                 radius: 60,
                 backgroundImage: _getAvatar(),
-                child: _getAvatar() == null ? const Icon(Icons.person, size: 60) : null,
+                child: _getAvatar() == null
+                    ? const Icon(Icons.person, size: 60)
+                    : null,
               ),
             ),
             const SizedBox(height: 30),
+
+            // 2. BASIC INFO
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: "Full Name", border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                labelText: "Full Name",
+                border: OutlineInputBorder(),
+              ),
             ),
+            const SizedBox(height: 15),
+            TextField(
+              controller: _phoneController,
+              keyboardType: TextInputType.phone,
+              decoration: const InputDecoration(
+                labelText: "Phone Number",
+                border: OutlineInputBorder(),
+              ),
+            ),
+
+            // 3. BIRTHDATE PICKER
+            const SizedBox(height: 15),
+            ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
+                side: BorderSide(color: Colors.grey.shade400),
+              ),
+              title: Text(
+                _selectedDate == null
+                    ? "Select Birthdate"
+                    : "Birthdate: ${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}",
+              ),
+              trailing: const Icon(Icons.calendar_today),
+              onTap: () async {
+                DateTime? picked = await showDatePicker(
+                  context: context,
+                  initialDate: _selectedDate ?? DateTime(2000),
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime.now(),
+                );
+                if (picked != null) setState(() => _selectedDate = picked);
+              },
+            ),
+
+            // 4. ADDRESS INFO
+            const SizedBox(height: 15),
+            TextField(
+              controller: _homeController,
+              decoration: const InputDecoration(
+                labelText: "Home Address",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 15),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _cityController,
+                    decoration: const InputDecoration(
+                      labelText: "City",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextField(
+                    controller: _homeTownController,
+                    decoration: const InputDecoration(
+                      labelText: "Home Town",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            // 5. SETTINGS & SAVE
             const SizedBox(height: 20),
             ListTile(
               onTap: () => Navigator.pushNamed(context, '/change-password'),
@@ -97,11 +196,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 40),
             SizedBox(
-              width: double.infinity, height: 50,
+              width: double.infinity,
+              height: 50,
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _handleUpdate,
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
-                child: const Text("SAVE CHANGES", style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                ),
+                child: const Text(
+                  "SAVE CHANGES",
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
           ],

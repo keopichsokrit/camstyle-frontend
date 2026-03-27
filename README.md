@@ -34,7 +34,8 @@ lib/
 ├── views/                        <-- THE DESIGN (Calls Controllers)
 │   ├── auth/
 │   │   ├── login_screen.dart		# Login/Register UI
-│   │   ├── register_screen.dart                     
+│   │   ├── register_screen.dart 
+│   │   ├── forgot_password_screen.dart                      
 │   │   └── start_screen.dart 
 │   ├── admin/                    # Admin Dashboard/Edit UI
 │   │   ├── new_product_screen.dart

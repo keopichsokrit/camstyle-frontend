@@ -1,6 +1,7 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
 import 'core/routes/app_routes.dart';
+import 'core/theme/app_theme.dart';
 
 void main() {
   runApp(const CamStyleApp());
@@ -14,6 +15,9 @@ class CamStyleApp extends StatelessWidget {
     return MaterialApp(
       title: 'CamStyle',
       debugShowCheckedModeBanner: false,
+      theme: lighttheme,
+      darkTheme: darktheme,
+      themeMode: ThemeMode.system,
       // Use the constant from your AppRoutes file
       initialRoute: AppRoutes.startUp, 
       // This is the magic line that connects to your generateRoute logic
