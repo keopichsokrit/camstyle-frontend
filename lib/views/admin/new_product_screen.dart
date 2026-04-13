@@ -1,5 +1,3 @@
-//import 'dart:typed_data'; // Needed for bytes
-//import 'package:flutter/foundation.dart'; // To check if kIsWeb
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../controllers/admin_controller.dart';
@@ -14,13 +12,13 @@ class NewProductScreen extends StatefulWidget {
 }
 
 class _NewProductScreenState extends State<NewProductScreen> {
+  // --- LOGIC PRESERVED ---
   final _name = TextEditingController();
   final _price = TextEditingController();
   final _qty = TextEditingController();
   final _desc = TextEditingController();
   String? _selectedCategoryId;
 
-  // Change: Store XFile instead of File to remain Web-compatible
   List<XFile> _selectedXFiles = [];
   bool _isLoading = false;
 
@@ -53,102 +51,244 @@ class _NewProductScreenState extends State<NewProductScreen> {
       'category': _selectedCategoryId!,
     };
 
-    // Pass the XFiles directly to the controller
     bool success = await AdminController.createProduct(
       context: context,
       fields: productData,
-      imageFiles: _selectedXFiles, // We changed this from imagePaths
+      imageFiles: _selectedXFiles,
     );
 
     if (mounted) setState(() => _isLoading = false);
     if (success && mounted) Navigator.pop(context);
   }
+  // -----------------------
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Add New Product")),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : FutureBuilder<List<CategoryModel>>(
-              future: CategoryController.getAllCategories(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+    final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor; // Luxury Gold
+    final scaffoldBg = theme.scaffoldBackgroundColor; // Midnight Black
 
-                return ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    const Text("Product Images (Max 5)", style: TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 10),
-                    Container(
-                      height: 120,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.grey[300]!),
-                      ),
-                      child: _selectedXFiles.isEmpty
-                          ? Center(
-                              child: IconButton(
-                                icon: const Icon(Icons.add_a_photo, size: 40),
-                                onPressed: _pickImages,
-                              ),
-                            )
-                          : ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: _selectedXFiles.length,
-                              itemBuilder: (context, index) {
-                                return Stack(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        // Use Image.network for Web preview (blob URL)
-                                        child: Image.network(
-                                          _selectedXFiles[index].path,
-                                          width: 100,
-                                          height: 100,
-                                          fit: BoxFit.cover,
-                                        ),
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          "ADD PRODUCT",
+          style: TextStyle(
+            color: primaryColor,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 2,
+          ),
+        ),
+      ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment.topRight,
+            radius: 1.5,
+            colors: [
+              theme.colorScheme.surface.withOpacity(0.1),
+              scaffoldBg,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: _isLoading
+              ? Center(child: CircularProgressIndicator(color: primaryColor))
+              : FutureBuilder<List<CategoryModel>>(
+                  future: CategoryController.getAllCategories(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return Center(child: CircularProgressIndicator(color: primaryColor));
+                    }
+
+                    return ListView(
+                      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+                      children: [
+                        // 1. IMAGE CAROUSEL SECTION
+                        Text(
+                          "PRODUCT IMAGES (MAX 5)",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: primaryColor,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                        Container(
+                          height: 150,
+                          decoration: BoxDecoration(
+                            color: theme.cardColor.withOpacity(0.05),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: theme.dividerColor.withOpacity(0.1)),
+                          ),
+                          child: _selectedXFiles.isEmpty
+                              ? Center(
+                                  child: TextButton.icon(
+                                    onPressed: _pickImages,
+                                    icon: Icon(Icons.add_a_photo_outlined, color: primaryColor),
+                                    label: Text("ADD IMAGES", style: TextStyle(color: theme.hintColor)),
+                                  ),
+                                )
+                              : ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  padding: const EdgeInsets.all(10),
+                                  itemCount: _selectedXFiles.length,
+                                  itemBuilder: (context, index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(right: 12),
+                                      child: Stack(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(15),
+                                            child: Image.network(
+                                              _selectedXFiles[index].path,
+                                              width: 130,
+                                              height: 130,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 5,
+                                            right: 5,
+                                            child: GestureDetector(
+                                              onTap: () => setState(() => _selectedXFiles.removeAt(index)),
+                                              child: Container(
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.black54,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                padding: const EdgeInsets.all(4),
+                                                child: const Icon(Icons.close, color: Colors.white, size: 16),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    Positioned(
-                                      right: 0,
-                                      child: IconButton(
-                                        icon: const Icon(Icons.cancel, color: Colors.red),
-                                        onPressed: () => setState(() => _selectedXFiles.removeAt(index)),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
+                                    );
+                                  },
+                                ),
+                        ),
+                        if (_selectedXFiles.isNotEmpty)
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: _pickImages,
+                              child: Text("Change Images", style: TextStyle(color: primaryColor, fontSize: 12)),
                             ),
-                    ),
-                    TextButton.icon(onPressed: _pickImages, icon: const Icon(Icons.image), label: const Text("Change/Add Images")),
-                    const Divider(height: 30),
-                    TextField(controller: _name, decoration: const InputDecoration(labelText: "Product Name")),
-                    TextField(controller: _price, decoration: const InputDecoration(labelText: "Price"), keyboardType: TextInputType.number),
-                    TextField(controller: _qty, decoration: const InputDecoration(labelText: "Quantity"), keyboardType: TextInputType.number),
-                    TextField(controller: _desc, decoration: const InputDecoration(labelText: "Description"), maxLines: 3),
-                    const SizedBox(height: 10),
-                    DropdownButton<String>(
-                      value: _selectedCategoryId,
-                      hint: const Text("Select Category"),
-                      isExpanded: true,
-                      items: snapshot.data!.map((cat) => DropdownMenuItem(value: cat.id, child: Text(cat.name))).toList(),
-                      onChanged: (val) => setState(() => _selectedCategoryId = val),
-                    ),
-                    const SizedBox(height: 30),
-                    ElevatedButton(
-                      onPressed: _submit,
-                      style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
-                      child: const Text("CREATE PRODUCT"),
-                    ),
-                  ],
-                );
-              },
-            ),
+                          ),
+                        
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Divider(thickness: 0.5),
+                        ),
+
+                        // 2. INPUT FIELDS
+                        _buildThemedField(controller: _name, label: "PRODUCT NAME", icon: Icons.shopping_bag_outlined, theme: theme),
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Expanded(child: _buildThemedField(controller: _price, label: "PRICE (\$)", icon: Icons.attach_money, theme: theme, keyboardType: TextInputType.number)),
+                            const SizedBox(width: 15),
+                            Expanded(child: _buildThemedField(controller: _qty, label: "QTY", icon: Icons.inventory_2_outlined, theme: theme, keyboardType: TextInputType.number)),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        _buildThemedField(controller: _desc, label: "DESCRIPTION", icon: Icons.description_outlined, theme: theme, maxLines: 3),
+                        
+                        const SizedBox(height: 20),
+
+                        // 3. CATEGORY DROPDOWN
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          decoration: BoxDecoration(
+                            color: theme.cardColor.withOpacity(0.05),
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(color: theme.dividerColor.withOpacity(0.1)),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              value: _selectedCategoryId,
+                              hint: Text("SELECT CATEGORY", style: TextStyle(color: theme.hintColor, fontSize: 12, letterSpacing: 1)),
+                              isExpanded: true,
+                              dropdownColor: scaffoldBg,
+                              icon: Icon(Icons.keyboard_arrow_down, color: primaryColor),
+                              items: snapshot.data!.map((cat) => DropdownMenuItem(
+                                value: cat.id, 
+                                child: Text(cat.name, style: const TextStyle(fontSize: 14)),
+                              )).toList(),
+                              onChanged: (val) => setState(() => _selectedCategoryId = val),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 40),
+
+                        // 4. SUBMIT BUTTON
+                        SizedBox(
+                          width: double.infinity,
+                          height: 55,
+                          child: ElevatedButton(
+                            onPressed: _submit,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryColor,
+                              foregroundColor: scaffoldBg,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                              elevation: 0,
+                            ),
+                            child: const Text("CREATE PRODUCT", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    );
+                  },
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThemedField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    int maxLines = 1,
+    required ThemeData theme,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return TextField(
+      controller: controller,
+      maxLines: maxLines,
+      keyboardType: keyboardType,
+      style: const TextStyle(fontSize: 14),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: theme.hintColor, fontSize: 10, letterSpacing: 1),
+        prefixIcon: Icon(icon, color: theme.primaryColor, size: 18),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(color: theme.dividerColor.withOpacity(0.1)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(color: theme.primaryColor),
+        ),
+        filled: true,
+        fillColor: theme.cardColor.withOpacity(0.05),
+        alignLabelWithHint: true,
+        contentPadding: const EdgeInsets.all(18),
+      ),
     );
   }
 }

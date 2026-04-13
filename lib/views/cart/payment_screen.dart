@@ -12,6 +12,7 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
+  // --- LOGIC PRESERVED ---
   String? qrString;
   String? md5;
   double totalAmount = 0.0;
@@ -37,7 +38,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
       });
       _startPolling();
     } else {
-      // Handle error (e.g., cart empty)
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Failed to generate QR. Is your cart empty?")),
       );
@@ -58,25 +58,50 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   void _showSuccessUI() {
+    final theme = Theme.of(context);
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: theme.scaffoldBackgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+          side: BorderSide(color: theme.primaryColor.withOpacity(0.5)),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.check_circle, color: Colors.green, size: 100),
+            const SizedBox(height: 10),
+            Icon(Icons.check_circle_outline, color: theme.primaryColor, size: 80),
             const SizedBox(height: 20),
-            const Text("Success!", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            const Text("Your payment was successful"),
-            const SizedBox(height: 24),
+            Text(
+              "PAYMENT SUCCESS",
+              style: TextStyle(
+                color: theme.primaryColor,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              "Your transaction was completed.",
+              textAlign: TextAlign.center,
+              style: TextStyle(color: theme.hintColor),
+            ),
+            const SizedBox(height: 30),
             SizedBox(
               width: double.infinity,
+              height: 50,
               child: ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-                onPressed: () => Navigator.pushNamedAndRemoveUntil(context, AppRoutes.userHome, (route) => false),
-                child: const Text("Back to Home", style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.primaryColor,
+                  foregroundColor: theme.scaffoldBackgroundColor,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                ),
+                onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                    context, AppRoutes.userHome, (route) => false),
+                child: const Text("CONTINUE", style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             )
           ],
@@ -90,77 +115,150 @@ class _PaymentScreenState extends State<PaymentScreen> {
     _timer?.cancel();
     super.dispose();
   }
+  // -----------------------
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor; // Luxury Gold
+    final scaffoldBg = theme.scaffoldBackgroundColor; // Midnight Black
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text("Bakong KHQR"),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        title: Text(
+          "CHECKOUT",
+          style: TextStyle(color: primaryColor, letterSpacing: 2, fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                children: [
-                  // Merchant Card
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      children: [
-                        const Text("CAMSTYLE SHOP", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                        const SizedBox(height: 8),
-                        Text("Bill: $billNumber", style: const TextStyle(color: Colors.grey)),
-                        const Divider(height: 30),
-                        const Text("Total Amount", style: TextStyle(fontSize: 16)),
-                        Text("\$${totalAmount.toStringAsFixed(2)}",
-                            style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: Colors.red)),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  // QR Section
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20)],
-                    ),
-                    child: Column(
-                      children: [
-                        const Text("Scan with Bakong or any Bank App", 
-                            style: TextStyle(fontWeight: FontWeight.w500, color: Colors.blueGrey)),
-                        const SizedBox(height: 20),
-                        QrImageView(
-                          data: qrString!,
-                          version: QrVersions.auto,
-                          size: 260.0,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment.topRight,
+            radius: 1.5,
+            colors: [theme.colorScheme.surface.withOpacity(0.1), scaffoldBg],
+          ),
+        ),
+        child: isLoading
+            ? Center(child: CircularProgressIndicator(color: primaryColor))
+            : SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+                  child: Column(
+                    children: [
+                      // 1. Merchant Card
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(25),
+                        decoration: BoxDecoration(
+                          color: theme.cardColor.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(25),
+                          border: Border.all(color: theme.dividerColor.withOpacity(0.1)),
                         ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            CircularProgressIndicator(strokeWidth: 2),
-                            SizedBox(width: 15),
-                            Text("Waiting for payment...", style: TextStyle(color: Colors.grey)),
+                        child: Column(
+                          children: [
+                            Text(
+                              "CAMSTYLE LUXE",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: primaryColor,
+                                letterSpacing: 3,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "INV #$billNumber",
+                              style: TextStyle(color: theme.hintColor.withOpacity(0.5), fontSize: 12),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 20),
+                              child: Divider(thickness: 0.5),
+                            ),
+                            const Text("Total Amount Due", style: TextStyle(fontSize: 14)),
+                            const SizedBox(height: 5),
+                            Text(
+                              "\$${totalAmount.toStringAsFixed(2)}",
+                              style: TextStyle(
+                                fontSize: 40,
+                                fontWeight: FontWeight.bold,
+                                color: primaryColor,
+                              ),
+                            ),
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+                      
+                      const SizedBox(height: 30),
+
+                      // 2. QR Section
+                      Container(
+                        padding: const EdgeInsets.all(30),
+                        decoration: BoxDecoration(
+                          color: Colors.white, // QR needs white background to be scannable
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Column(
+                          children: [
+                            const Text(
+                              "SCAN KHQR TO PAY",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                                letterSpacing: 1,
+                              ),
+                            ),
+                            const SizedBox(height: 25),
+                            QrImageView(
+                              data: qrString!,
+                              version: QrVersions.auto,
+                              size: 240.0,
+                              eyeStyle: const QrEyeStyle(eyeShape: QrEyeShape.square, color: Colors.black),
+                              dataModuleStyle: const QrDataModuleStyle(dataModuleShape: QrDataModuleShape.square, color: Colors.black),
+                            ),
+                            const SizedBox(height: 25),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.grey.shade400),
+                                ),
+                                const SizedBox(width: 15),
+                                const Text(
+                                  "Awaiting Payment...",
+                                  style: TextStyle(color: Colors.grey, fontSize: 13),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 30),
+                      Text(
+                        "Please do not close this screen while payment is processing.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: theme.hintColor.withOpacity(0.5),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
+      ),
     );
   }
 }

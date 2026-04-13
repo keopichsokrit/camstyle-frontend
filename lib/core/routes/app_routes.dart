@@ -17,6 +17,11 @@ import '../../views/admin/update_category_screen.dart';
 import '../../views/user/change_password_screen.dart';
 import '../../views/user/help_screen.dart';
 import '../../views/auth/forgot_password_screen.dart';
+import '../../views/user/wishlist_screen.dart';
+import '../../views/user/profile_info_screen.dart';
+import '../../views/user/notification_screen.dart';
+import '../../views/user/login_log_screen.dart';
+
 
 class AppRoutes {
   static const String startUp = '/';
@@ -27,6 +32,7 @@ class AppRoutes {
   static const String productDetail = '/product-detail';
   static const String cart = '/cart';
   static const String profile = '/profile';
+  static const String wishlist = '/wishlist';
   static const String payment = '/payment';
   static const String newProduct = '/new-product';
   static const String newCategory = '/new-category';
@@ -35,6 +41,9 @@ class AppRoutes {
   static const String changePassword = '/change-password';
   static const String help = '/help';
   static const String forgotPassword = '/forgot-password';
+  static const String profileInfo = '/profile-info';
+  static const String Notifications = '/notifications';
+  static const String loginLogs = '/login-logs';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -92,7 +101,14 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const HelpScreen());
       case forgotPassword:
         return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
-
+      case wishlist:
+        return MaterialPageRoute(builder: (_) => const WishlistScreen());
+      case profileInfo:
+        return MaterialPageRoute(builder: (_) => const ProfileInfoScreen());
+      case Notifications:
+        return MaterialPageRoute(builder: (_) => const NotificationScreen());
+      case loginLogs:
+        return MaterialPageRoute(builder: (_) => const LoginLogScreen());
       // 4. ONLY ONE DEFAULT AT THE BOTTOM
       default:
         return _errorRoute("No route defined for ${settings.name}");

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:camstyle_frontend/models/login_log_model.dart';
 import 'package:flutter/material.dart';
 import '../core/constrains/api_constants.dart';
 import '../core/utils/storage_helper.dart';
@@ -22,7 +23,10 @@ class AuthController {
 
         // Save token to storage for future API calls
         await StorageHelper.saveToken(data['token']);
-
+            
+        await StorageHelper.saveRole(data['role']);
+        await StorageHelper.saveName(data['name']);
+        
         // Check role and navigate
         if (data['role'] == 'admin') {
           Navigator.pushReplacementNamed(context, AppRoutes.adminHome);
@@ -138,4 +142,17 @@ class AuthController {
       _showError(context, "Connection Error");
     }
   }
+  static Future<List<LoginLogModel>> getLoginLogs() async {
+  try {
+    final response = await ApiConstants.get("${ApiConstants.baseUrl}/auth/logs");
+    if (response.statusCode == 200) {
+      List data = jsonDecode(response.body);
+      return data.map((log) => LoginLogModel.fromJson(log)).toList();
+    }
+    return [];
+  } catch (e) {
+    print("Error fetching logs: $e");
+    return [];
+  }
+}
 }

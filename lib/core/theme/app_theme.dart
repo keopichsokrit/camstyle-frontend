@@ -1,34 +1,61 @@
 import 'package:flutter/material.dart';
 
-ColorScheme cs = ColorScheme.fromSeed(seedColor: Colors.cyanAccent);
-ColorScheme sc = ColorScheme.fromSeed(seedColor: Colors.blue);
-final ThemeData lighttheme = ThemeData(
-  appBarTheme: AppBarTheme(
-    backgroundColor: cs.primary,
+// Brand Palette constants
+const Color luxuryGold = Color(0xFFC5A358);
+const Color midnightBlack = Color(0xFF0A0A0A);
+
+final ThemeData lightTheme = ThemeData(
+  brightness: Brightness.light,
+  scaffoldBackgroundColor: Colors.white,
+  primaryColor: luxuryGold,
+  appBarTheme: const AppBarTheme(
+    backgroundColor: Colors.white,
+    foregroundColor: midnightBlack,
+    elevation: 0,
+    iconTheme: IconThemeData(color: midnightBlack),
   ),
-  scaffoldBackgroundColor: cs.secondary,
-  drawerTheme: DrawerThemeData(
-    backgroundColor: cs.secondary,
+  // Gold buttons for Light Mode
+  elevatedButtonTheme: ElevatedButtonThemeData(
+    style: ElevatedButton.styleFrom(
+      backgroundColor: luxuryGold,
+      foregroundColor: Colors.white,
+    ),
   ),
-  floatingActionButtonTheme: FloatingActionButtonThemeData(
-    backgroundColor: cs.tertiary,
-  ),
-  bottomNavigationBarTheme: BottomNavigationBarThemeData(
-    backgroundColor: cs.primary,
-  ),
-);
-final ThemeData darktheme = ThemeData(
-  appBarTheme: AppBarTheme(
-    backgroundColor: sc.primary,
-  ),
-  scaffoldBackgroundColor: cs.secondary,
-  drawerTheme: DrawerThemeData(
-    backgroundColor: sc.secondary,
-  ),
-  floatingActionButtonTheme: FloatingActionButtonThemeData(
-    backgroundColor: sc.tertiary,
-  ),
-  bottomNavigationBarTheme: BottomNavigationBarThemeData(
-    backgroundColor: sc.primary,
+  textTheme: const TextTheme(
+    bodyLarge: TextStyle(color: midnightBlack),
+    bodyMedium: TextStyle(color: midnightBlack),
   ),
 );
+
+final ThemeData darkTheme = ThemeData(
+  brightness: Brightness.dark,
+  scaffoldBackgroundColor: midnightBlack,
+  primaryColor: luxuryGold,
+  appBarTheme: const AppBarTheme(
+    backgroundColor: midnightBlack,
+    foregroundColor: luxuryGold,
+    elevation: 0,
+    iconTheme: IconThemeData(color: luxuryGold),
+  ),
+  // Gold buttons for Dark Mode
+  elevatedButtonTheme: ElevatedButtonThemeData(
+    style: ElevatedButton.styleFrom(
+      backgroundColor: luxuryGold,
+      foregroundColor: midnightBlack,
+    ),
+  ),
+  textTheme: const TextTheme(
+    bodyLarge: TextStyle(color: Colors.white),
+    bodyMedium: TextStyle(color: Colors.white),
+  ),
+);
+
+class AppTheme {
+  static final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
+
+  static void toggleTheme() {
+    themeNotifier.value = themeNotifier.value == ThemeMode.light 
+        ? ThemeMode.dark 
+        : ThemeMode.light;
+  }
+}

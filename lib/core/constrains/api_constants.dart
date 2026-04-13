@@ -8,9 +8,9 @@ class ApiConstants {
   // Use '10.0.2.2' for Android Emulator to access localhost, 
   // or your machine's local IP for physical devices.
   // static const String baseUrl = "http://10.0.2.2:5000/api";
-  // static const String baseUrl = "http://localhost:5000/api";
+  static const String baseUrl = "http://localhost:5000/api";
   // NEW (for your live Render server)
-  static const String baseUrl = "https://camstyle-backend.onrender.com/api";
+  // static const String baseUrl = "https://camstyle-backend.onrender.com/api";
 
   // 2. Endpoints
   // Auth
@@ -32,7 +32,20 @@ class ApiConstants {
   // Profile Update
   static const String updateProfile = "$baseUrl/profile/update";
   static const String forgotPassword = "$baseUrl/auth/forgot-password"; // ADD THIS
-static const String resetPassword = "$baseUrl/auth/reset-password";   // ADD THIS
+  static const String resetPassword = "$baseUrl/auth/reset-password";   // ADD THIS
+
+  // Wishlist
+  static const String wishlist = "$baseUrl/products/wishlist";
+  static String toggleWishlist(String id) => "$baseUrl/products/wishlist/$id";
+  // Sizes (if needed for product options)
+  static const String sizes = "$baseUrl/sizes";
+  // Colors (if needed for product options)
+  static const String colors = "$baseUrl/colors";
+  // Banners (if you have a homepage carousel)
+  static const String banners = "$baseUrl/banners";
+  // Notifications (if you implement user notifications)
+  static const String notifications = "$baseUrl/notifications";
+
 
   // 3. Centralized HTTP Logic (The Engine)
   // This allows controllers to call API without writing 'Header' logic every time

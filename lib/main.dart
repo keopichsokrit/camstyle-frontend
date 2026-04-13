@@ -12,16 +12,21 @@ class CamStyleApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: AppTheme.themeNotifier,
+      builder: (_, ThemeMode currentMode, __) {
     return MaterialApp(
       title: 'CamStyle',
       debugShowCheckedModeBanner: false,
-      theme: lighttheme,
-      darkTheme: darktheme,
-      themeMode: ThemeMode.system,
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: currentMode, // Start with system theme, but can be toggled in profile
       // Use the constant from your AppRoutes file
       initialRoute: AppRoutes.startUp, 
       // This is the magic line that connects to your generateRoute logic
       onGenerateRoute: AppRoutes.generateRoute, 
+    );
+      },
     );
   }
 }

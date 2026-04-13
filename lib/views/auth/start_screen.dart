@@ -1,102 +1,153 @@
 import 'package:flutter/material.dart';
 import '../../core/routes/app_routes.dart';
+import '../../core/utils/storage_helper.dart';
 
-class StartUpScreen extends StatelessWidget {
+class StartUpScreen extends StatefulWidget {
   const StartUpScreen({super.key});
 
   @override
+  State<StartUpScreen> createState() => _StartUpScreenState();
+}
+
+class _StartUpScreenState extends State<StartUpScreen> {
+  
+  @override
+  void initState() {
+    super.initState();
+    _checkSession(); 
+  }
+
+  Future<void> _checkSession() async {
+    final token = await StorageHelper.getToken();
+    final role = await StorageHelper.getRole();
+
+    if (token != null && token.isNotEmpty) {
+      if (!mounted) return;
+      if (role == 'admin') {
+        Navigator.pushReplacementNamed(context, AppRoutes.adminHome);
+      } else {
+        Navigator.pushReplacementNamed(context, AppRoutes.userHome);
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Defining the palette based on the logo
+    const Color luxuryGold = Color(0xFFC5A358); // Gold color from logo
+    const Color midnightBlack = Color(0xFF0A0A0A); // Deep textured black
+
     return Scaffold(
-      // The overall page background color, defined in your app_theme.dart
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            // CrossAxisAlign stretches the column horizontally, allowing 
-            // the buttons at the bottom to fill the width.
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              
-              // --- TOP SECTION (Welcome/App Info) ---
-              // Using Expanded here ensures this section pushes the bottom section 
-              // all the way down, leaving nice clean spacing.
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Placeholder for your app logo/icon
-                    Container(
-                      height: 100,
-                      width: 100,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Icon(
-                        IconData(0xe21d, fontFamily: 'MaterialIcons'), // An app icon placeholder
-                        size: 60,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    
-                    const Text(
-                      "CamStyle",
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    
-                    const Text(
-                      "Discover your perfect style, right at your fingertips. Discover the latest trends with CamStyle.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey, // Simple and clean
-                        height: 1.5, // Better readability
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              
-              // --- BOTTOM SECTION (Login/Register Buttons) ---
-              // This section will sit snugly at the bottom of the screen.
-              Column(
-                // Stretch to fill the width
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+      // Dark background to make the logo and gold accents pop
+      backgroundColor: midnightBlack, 
+      body: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          // Subtle radial gradient to simulate the lighting in your logo image
+          gradient: RadialGradient(
+            center: Alignment.center,
+            radius: 1.2,
+            colors: [
+              Colors.white.withOpacity(0.05),
+              midnightBlack,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 40.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // LOGIN BUTTON (Primary Action)
-                  // Requirement #4: Uses named route AppRoutes.login
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, AppRoutes.login);
-                    },
-                    child: const Text("Sign In to Continue"),
+                  // 1. LOGO SECTION - Using your actual logo asset
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    child: CircleAvatar(
+                      backgroundImage: AssetImage('lib/assets/images/shoplogo.png'), // Ensure this path matches your logo
+                      radius: 60,
+                    ),
                   ),
                   
-                  const SizedBox(height: 16),
-                  
-                  // REGISTER BUTTON (Secondary Action)
-                  // Requirement #4: Uses named route AppRoutes.register
-                  // OutlinedButton offers a clean, visual separation from the main button.
-                  OutlinedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, AppRoutes.register);
-                    },
-                    child: const Text("Create a New Account"),
+                  const SizedBox(height: 10),
+
+                  // 2. TAGLINE - Using elegant spacing
+                  Text(
+                    "FASHION • STYLE • YOU",
+                    style: TextStyle(
+                      color: luxuryGold.withOpacity(0.8),
+                      fontSize: 12,
+                      letterSpacing: 4,
+                      fontWeight: FontWeight.w300,
+                    ),
                   ),
                   
-                  // Simple aesthetic spacing at the very bottom
+                  const SizedBox(height: 60),
+
+                  // 3. PRIMARY ACTION BUTTON (Luxury Gold Style)
+                  SizedBox(
+                    width: double.infinity,
+                    height: 55,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: luxuryGold,
+                        foregroundColor: midnightBlack,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30), // More elegant rounded shape
+                        ),
+                      ),
+                      onPressed: () => Navigator.pushNamed(context, AppRoutes.login),
+                      child: const Text(
+                        "SIGN IN",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 20),
+
+                  // 4. SECONDARY ACTION BUTTON (Minimalist Outline)
+                  SizedBox(
+                    width: double.infinity,
+                    height: 55,
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: luxuryGold.withOpacity(0.5), width: 1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      onPressed: () => Navigator.pushNamed(context, AppRoutes.register),
+                      child: const Text(
+                        "CREATE ACCOUNT",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.white,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 40),
+                  
+                  // 5. FOOTER
+                  Text(
+                    "Discover the luxury of style.",
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.3),
+                      fontSize: 12,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),
